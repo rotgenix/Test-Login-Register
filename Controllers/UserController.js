@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import { UserModel } from '../Database/Models/Models.js';
 
+//login controller
 export const loginController = async (req, res) => {
     const {
         username,
@@ -15,7 +16,7 @@ export const loginController = async (req, res) => {
         const passMatch = await bcrypt.compare(password, userLogin.password);
 
         if (passMatch) {
-            const token = jwt.sign({ _id: userLogin._id }, "asdfghadsa");
+            const token = jwt.sign({ _id: userLogin._id }, process.env.JWT_SECRET);
             // console.log("login token", token);
 
             res.status(201).cookie("token", token, {
@@ -44,6 +45,7 @@ export const loginController = async (req, res) => {
     }
 }
 
+//register function
 export const registerController = async (req, res) => {
     const {
         email,
@@ -79,7 +81,7 @@ export const registerController = async (req, res) => {
                 password: encryptesPassword,
             })
 
-            const token = jwt.sign({ _id: createdUser._id }, "asdfghadsa");
+            const token = jwt.sign({ _id: createdUser._id }, process.env.JWT_SECRET);
 
             res.cookie("token", token, {
                 httpOnly: true,
@@ -95,6 +97,7 @@ export const registerController = async (req, res) => {
     }
 }
 
+//forgot password function
 export const forgotPasswordController = async (req, res) => {
     const {
         email,
@@ -138,3 +141,23 @@ export const forgotPasswordController = async (req, res) => {
     }
 }
 
+//user Log Out function
+export const logOutController = async (req, res) => {
+    try {
+        res.status(201).cookie("token", null, {
+            httpOnly: true,
+            expires: new Date(Date.now()),
+            sameSite: "none",
+            secure: true,
+        }).json({
+            success: 'true',
+            messsage: "You are Logged out Successfully",
+            // userLogin
+        })
+    } catch (error) {
+        res.json({
+            success: false,
+            messsage: "You are Logged out Successfully",
+        })
+    }
+}

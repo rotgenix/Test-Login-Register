@@ -12,12 +12,11 @@ export const loginController = async (req, res) => {
     let userLogin = await UserModel.findOne({ username });
 
     if (userLogin) {
-
+        //checking hashed password and user entered password
         const passMatch = await bcrypt.compare(password, userLogin.password);
-
         if (passMatch) {
+
             const token = jwt.sign({ _id: userLogin._id }, process.env.JWT_SECRET);
-            // console.log("login token", token);
 
             res.status(201).cookie("token", token, {
                 httpOnly: true,
@@ -62,9 +61,7 @@ export const registerController = async (req, res) => {
         })
     }
     else {  //username exists
-
         let userEmail = await UserModel.findOne({ email });
-
         //email exists
         if (userEmail) {
             res.json({
@@ -73,6 +70,8 @@ export const registerController = async (req, res) => {
             })
         }
         else { //email not exists
+
+            //Password hashing
             const encryptesPassword = await bcrypt.hash(password, 10);
 
             let createdUser = await UserModel.create({
@@ -81,6 +80,7 @@ export const registerController = async (req, res) => {
                 password: encryptesPassword,
             })
 
+            //JWT token
             const token = jwt.sign({ _id: createdUser._id }, process.env.JWT_SECRET);
 
             res.cookie("token", token, {
@@ -114,13 +114,12 @@ export const forgotPasswordController = async (req, res) => {
 
             const encryptesPassword = await bcrypt.hash(newpassword, 10);
             // console.log("update")
-            console.log("111")
+            // console.log("111")
             let userLogin = await UserModel.findOneAndUpdate({ email }, {
                 username, email,
                 password: encryptesPassword
             });
-            console.log("update")
-
+            // console.log("update")
             res.json({
                 success: 'true',
                 messsage: "Passowrd reset Successfully",

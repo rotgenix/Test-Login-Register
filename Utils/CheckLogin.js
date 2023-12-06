@@ -9,7 +9,7 @@ export const checkLogin = async (req, res, next) => {
         req.userID = userID._id;
         //if login then saving userid from token to req for accessing it in further routes
         // req.userID = user
-        console.log("call next")
+        // console.log("call next")
         next();
     }
     else {
